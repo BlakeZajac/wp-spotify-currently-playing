@@ -13,14 +13,44 @@ class Spotify_Currently_Playing_Api {
         $this->base_url_token = $auth->get_base_url_token();
     }
 
-    public function get_request( $endpoint ) {
-        return $this->make_request( $this->get_base_url(), $endpoint, 'GET' );
+    /**
+     * Performs a GET request to the Spotify API.
+     * 
+     * @since 1.0.0
+     * 
+     * @param string $base_url The base URL to use for the request. Default is 'api'.
+     * @param string $endpoint The API endpoint to request.
+     * 
+     * @return mixed|false The API response as an object, or false on failure.
+     */
+    public function get_request( $base_url = 'api', $endpoint ) {
+        return $this->make_request( $this->get_base_url( $base_url ), $endpoint, 'GET' );
     }
 
-    public function post_request( $endpoint, $data = null ) {
-        return $this->make_request( $this->get_base_url(), $endpoint, 'POST', $data );
+    /**
+     * Performs a POST request to the Spotify API.
+     * 
+     * @since 1.0.0
+     * 
+     * @param string $base_url The base URL to use for the request. Default is 'api'.
+     * @param string $endpoint The API endpoint to request.
+     * @param array|null $data The data to send with the POST request.
+     * 
+     * @return mixed|false The API response as an object, or false on failure.
+     */
+    public function post_request( $base_url = 'api', $endpoint, $data = null ) {
+        return $this->make_request( $this->get_base_url( $base_url ), $endpoint, 'POST', $data );
     }
 
+    /**
+     * Gets the appropriate base URL based on the given type.
+     * 
+     * @since 1.0.0
+     * 
+     * @param string $base_url The base URL to use for the request. Default is 'api'.
+     * 
+     * @return string The base URL.
+     */
     protected function get_base_url( $base_url = 'api' ) {
         switch( $base_url ) {
             case 'authorize':
@@ -32,6 +62,18 @@ class Spotify_Currently_Playing_Api {
         }
     }
 
+    /**
+     * Makes an HTTP request to the Spotify API.
+     * 
+     * @since 1.0.0
+     * 
+     * @param string $base_url The base URL to use for the request.
+     * @param string $endpoint The API endpoint to request.
+     * @param string $method The HTTP method to use for the request. Default is 'POST'.
+     * @param array|null $data The data to send with the POST request.
+     * 
+     * @return mixed|false The API response as an object, or false on failure.
+     */
     protected function make_request( $base_url, $endpoint, $method = 'POST', $data = null ) {
         $url = $base_url . $endpoint;
 

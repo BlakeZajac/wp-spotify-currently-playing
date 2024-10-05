@@ -22,11 +22,8 @@ class Spotify_Currently_Playing_Requests {
     public function get_authorization_token() {
         SCP()->logging->write_log( 'A request has been made to get the Spotify authorization token.' );
 
-        $base_url = $this->auth->get_base_url_authorize();
-        $client_id = $this->auth->get_client_id();
-
-        $endpoint = $base_url . '?' . http_build_query( array(
-            'client_id' => $client_id,
+        $endpoint = '?' . http_build_query( array(
+            'client_id' => $this->auth->get_client_id(),
             'response_type' => 'code',
             'redirect_uri' => get_home_url(),
             'scope' => 'user-read-currently-playing',
@@ -34,7 +31,7 @@ class Spotify_Currently_Playing_Requests {
             'show_dialog' => 'true',
         ) );
 
-        $result = $this->api->post_request( $endpoint );
+        $result = $this->api->post_request( 'authorize', $endpoint );
 
         if ( $result ) {
             SCP()->logging->write_log( 'The Spotify authorization token has been generated.' );
@@ -62,20 +59,18 @@ class Spotify_Currently_Playing_Requests {
     public function get_access_token( $authorization_code = null ) {
         SCP()->logging->write_log( 'A request has been made to generate the Spotify access token.' );
 
-        $base_url = $this->auth->get_base_url_token();
-
         if ( ! $authorization_code ) {
             SCP()->logging->write_log( 'No authorization code was provided. Cannot request access token.' );
             return false;
         }
 
-        $endpoint = $base_url . '?' . http_build_query( array(
+        $endpoint = '?' . http_build_query( array(
             'grant_type' => 'authorization_code',
             'code' => $authorization_code,
             'redirect_uri' => get_home_url(),
         ) );
 
-        $result = $this->api->post_request( $endpoint );
+        $result = $this->api->post_request( 'token', $endpoint );
 
         if ( $result ) {
             SCP()->logging->write_log( 'The Spotify access token has been generated.' );
