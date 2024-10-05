@@ -25,7 +25,7 @@ class Spotify_Currently_Playing_Requests {
         $endpoint = '?' . http_build_query( array(
             'client_id' => $this->auth->get_client_id(),
             'response_type' => 'code',
-            'redirect_uri' => get_home_url(),
+            'redirect_uri' => $this->auth->get_redirect_uri(),
             'scope' => 'user-read-currently-playing',
             'state' => bin2hex( random_bytes( 16 ) ),
             'show_dialog' => 'true',
@@ -67,7 +67,7 @@ class Spotify_Currently_Playing_Requests {
         $endpoint = '?' . http_build_query( array(
             'grant_type' => 'authorization_code',
             'code' => $authorization_code,
-            'redirect_uri' => get_home_url(),
+            'redirect_uri' => $this->auth->get_redirect_uri(),
         ) );
 
         $result = $this->api->post_request( 'token', $endpoint );
@@ -81,5 +81,38 @@ class Spotify_Currently_Playing_Requests {
         }
 
         return $result;
+    }
+
+    /**
+     * Retrieve the currently playing track from Spotify.
+     * 
+     * This method sends a GET request to Spotify's API to fetch information
+     * about the users' currently playing track. If successful, it returns an array
+     * containing the track's URL, title, artist, and album image.
+     * 
+     * @since 1.0.0
+     * 
+     * @return array|false An array containing track information if successful, false otherwise.
+     */
+    public function get_currently_playing() {
+        SCP()->logging->write_log( 'A request has been made to get the currently playing track.' );
+
+        $endpoint = '/me/player/currently-playing';
+
+        $result = $this->api->get_request( $endpoint );
+
+        if ( $result && isset( $result->item ) ) {
+            SCP()->logging->write_log( 'The currently playing track has been retrieved.' );
+
+            return array(
+                'url' => $result->item->external_urls->spotify ?? '',
+                'title' => $result->item->name ?? '',
+                'artist' => $result->item->artists[0]->name ?? '',
+                'album_image' => $result->item->album->images[0]->url ?? '',
+            );
+        } else {
+            SCP()->logging->write_log( 'The currently playing track could not be retrieved.' );
+            return false;
+        }
     }
 }

@@ -72,7 +72,7 @@ class Spotify_Currently_Playing {
         $this->auth = new Spotify_Currently_Playing_Auth();
         $this->api = new Spotify_Currently_Playing_Api( $this->auth );
         $this->logging = new Spotify_Currently_Playing_Logging();
-        $this->requests = new Spotify_Currently_Playing_Requests( $this->api, $this->logging );
+        $this->requests = new Spotify_Currently_Playing_Requests( $this->auth, $this->api );
     }
 }
 
