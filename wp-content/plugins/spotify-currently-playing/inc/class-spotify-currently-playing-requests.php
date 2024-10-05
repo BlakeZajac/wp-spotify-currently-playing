@@ -54,6 +54,8 @@ class Spotify_Currently_Playing_Requests {
      * 
      * @since 1.0.0
      * 
+     * @param string $authorization_code The authorization code received from the previous authorization step.
+     * 
      * @return string|bool The access token if successful, false otherwise.
      */
     public function get_access_token( $authorization_code = null ) {
