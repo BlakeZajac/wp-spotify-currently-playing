@@ -3,11 +3,13 @@
 class Spotify_Currently_Playing_Api {
     protected $base_url_authorize;
     protected $base_url_api;
+    protected $base_url_token;
 
     public function __construct( Spotify_Currently_Playing_Auth $auth ) {
         $this->auth = $auth;
         $this->base_url_authorize = $auth->get_base_url_authorize();
         $this->base_url_api = $auth->get_base_url_api();
+        $this->base_url_token = $auth->get_base_url_token();
     }
 
     public function get_request( $endpoint ) {
@@ -18,8 +20,15 @@ class Spotify_Currently_Playing_Api {
         return $this->make_request( $this->get_base_url(), $endpoint, 'POST', $data );
     }
 
-    protected function get_base_url() {
-        return $this->base_url_api;
+    protected function get_base_url( $base_url = 'api' ) {
+        switch( $base_url ) {
+            case 'authorize':
+                return $this->base_url_authorize;
+            case 'token':
+                return $this->base_url_token;
+            default:
+                return $this->base_url_api;
+        }
     }
 
     protected function make_request( $base_url, $endpoint, $method = 'POST', $data = null ) {
