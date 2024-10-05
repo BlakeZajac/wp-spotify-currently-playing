@@ -53,8 +53,9 @@ class Spotify_Currently_Playing_Requests {
      * received from the previous authorization step. If successful, the access token is stored in the session.
      * 
      * @since 1.0.0
-     * 
+     *  
      * @param string $authorization_code The authorization code received from the previous authorization step.
+     * @see Spotify_Currently_Playing_Requests::get_authorization_token()
      * 
      * @return string|bool The access token if successful, false otherwise.
      */
