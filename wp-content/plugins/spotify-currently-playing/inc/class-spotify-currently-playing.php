@@ -34,6 +34,13 @@ class Spotify_Currently_Playing {
     public $logging = null;    
 
     /**
+     * Login instance
+     * 
+     * @var Spotify_Currently_Playing_Login
+     */
+    public $login = null;
+
+    /**
      * Spotify_Currently_Playing constructor
      */
     public function __construct() {
@@ -58,12 +65,14 @@ class Spotify_Currently_Playing {
         include_once 'class-spotify-currently-playing-logging.php';
         include_once 'class-spotify-currently-playing-auth.php';
         include_once 'class-spotify-currently-playing-api.php';
+        include_once 'class-spotify-currently-playing-login.php';
     }
 
     public function init() {
         $this->auth = new Spotify_Currently_Playing_Auth();
         $this->api = new Spotify_Currently_Playing_Api();
         $this->logging = new Spotify_Currently_Playing_Logging();
+        $this->login = new Spotify_Currently_Playing_Login( $this->api, $this->logging );
     }
 }
 
