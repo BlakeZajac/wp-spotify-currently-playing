@@ -38,4 +38,39 @@ class Spotify_Currently_Playing_Requests {
 
         return $endpoint;
     }
+
+    /**
+     * Request an access token from Spotify.
+     * 
+     * This method sends a POST request to Spotify's token endpoint to obtain an access token using the authorization code
+     * received from the previous authorization step. If successful, the access token is stored in the session.
+     * 
+     * @since 1.0.0
+     * 
+     * @return string|bool The access token if successful, false otherwise.
+     */
+    public function request_access_token() {
+        $this->logging->write_log( 'A request has been made to generate the Spotify access token.' );
+
+        $base_url = $this->auth->get_base_url_token();
+        $authorization_code = ''; // @todo Get this from the previous method
+
+        $endpoint = $base_url . '?' . http_build_query( array(
+            'grant_type' => 'authorization_code',
+            'code' => $authorization_code,
+            'redirect_uri' => get_home_url(),
+        ) );
+
+        $result = $this->api->post_request( $endpoint );
+
+        if ( $result ) {
+            $this->logging->write_log( 'The Spotify access token has been generated.' );
+            $_SESSION['spotify_access_token'] = $result;
+        } else {
+            $this->logging->write_log( 'The Spotify access token could not be generated.' );
+            return false;
+        }
+
+        return $result;
+    }
 }

@@ -38,8 +38,7 @@ class Spotify_Currently_Playing_Api {
         $args = array(
             'method' => $method,
             'headers' => array(
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'Basic ' . base64_encode( $this->auth->get_client_id() . ':' . $this->auth->get_client_secret() ),
             )
         );
