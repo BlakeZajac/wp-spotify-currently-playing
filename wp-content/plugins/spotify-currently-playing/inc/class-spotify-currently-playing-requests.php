@@ -4,7 +4,7 @@ class Spotify_Currently_Playing_Requests {
     protected $auth;
     protected $api;
 
-    public function __construct( Spotify_Currently_Playing_Auth $auth, Spotify_Currently_Playing_Api $api, Spotify_Currently_Playing_Logging $logging ) {
+    public function __construct( Spotify_Currently_Playing_Auth $auth, Spotify_Currently_Playing_Api $api ) {
         $this->auth = $auth;
         $this->api = $api;
     }
