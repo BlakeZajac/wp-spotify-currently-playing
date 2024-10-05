@@ -3,26 +3,24 @@
 class Spotify_Currently_Playing_Requests {
     protected $auth;
     protected $api;
-    protected $logging;
 
     public function __construct( Spotify_Currently_Playing_Auth $auth, Spotify_Currently_Playing_Api $api, Spotify_Currently_Playing_Logging $logging ) {
         $this->auth = $auth;
         $this->api = $api;
-        $this->logging = $logging;
     }
 
     /**
-     * Generate the Spotify authorization URL.
+     * Request an authorization token from Spotify.
      * 
-     * This method creates a URL that, when accessed, will prompt the user to authorize the application to access their Spotify data.
-     * The URL includes necessary paramaters such as client ID, redirect URI, and required scopes.
+     * This method sends a POST request to Spotify's authorization endpoint to obtain an authorization token.
+     * If successful, the authorization token is returned.
      * 
      * @since 1.0.0
      * 
-     * @return string The complete Spotify authorization URL.
+     * @return string|bool The authorization token if successful, false otherwise.
      */
     public function get_authorization_token() {
-        $this->logging->write_log( 'A request has been made to get the Spotify authorization token.' );
+        SCP()->logging->write_log( 'A request has been made to get the Spotify authorization token.' );
 
         $base_url = $this->auth->get_base_url_authorize();
         $client_id = $this->auth->get_client_id();
@@ -36,7 +34,16 @@ class Spotify_Currently_Playing_Requests {
             'show_dialog' => 'true',
         ) );
 
-        return $endpoint;
+        $result = $this->api->post_request( $endpoint );
+
+        if ( $result ) {
+            SCP()->logging->write_log( 'The Spotify authorization token has been generated.' );
+        } else {
+            SCP()->logging->write_log( 'The Spotify authorization token could not be generated.' );
+            return false;
+        }
+
+        return $result;
     }
 
     /**
@@ -49,11 +56,15 @@ class Spotify_Currently_Playing_Requests {
      * 
      * @return string|bool The access token if successful, false otherwise.
      */
-    public function request_access_token() {
-        $this->logging->write_log( 'A request has been made to generate the Spotify access token.' );
+    public function get_access_token( $authorization_code = null ) {
+        SCP()->logging->write_log( 'A request has been made to generate the Spotify access token.' );
 
         $base_url = $this->auth->get_base_url_token();
-        $authorization_code = ''; // @todo Get this from the previous method
+
+        if ( ! $authorization_code ) {
+            SCP()->logging->write_log( 'No authorization code was provided. Cannot request access token.' );
+            return false;
+        }
 
         $endpoint = $base_url . '?' . http_build_query( array(
             'grant_type' => 'authorization_code',
@@ -64,10 +75,10 @@ class Spotify_Currently_Playing_Requests {
         $result = $this->api->post_request( $endpoint );
 
         if ( $result ) {
-            $this->logging->write_log( 'The Spotify access token has been generated.' );
+            SCP()->logging->write_log( 'The Spotify access token has been generated.' );
             $_SESSION['spotify_access_token'] = $result;
         } else {
-            $this->logging->write_log( 'The Spotify access token could not be generated.' );
+            SCP()->logging->write_log( 'The Spotify access token could not be generated.' );
             return false;
         }
 
