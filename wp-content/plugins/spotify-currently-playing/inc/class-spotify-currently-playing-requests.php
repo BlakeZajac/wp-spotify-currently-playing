@@ -105,9 +105,10 @@ class Spotify_Currently_Playing_Requests {
             SCP()->logging->write_log( 'The currently playing track has been retrieved.' );
 
             return array(
+                'is_playing' => $result->is_playing ?? false,
                 'url' => $result->item->external_urls->spotify ?? '',
                 'title' => $result->item->name ?? '',
-                'artist' => $result->item->artists[0]->name ?? '',
+                'artist' => implode( ', ', array_map( function( $artist ) { return $artist->name; }, $result->item->artists ) ),
                 'album_image' => $result->item->album->images[0]->url ?? '',
             );
         } else {
