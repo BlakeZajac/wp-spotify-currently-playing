@@ -1,30 +1,31 @@
 <?php
 
 class Spotify_Currently_Playing_Requests {
+    protected $auth;
     protected $api;
     protected $logging;
 
-    public function __construct( Spotify_Currently_Playing_Api $api, Spotify_Currently_Playing_Logging $logging ) {
+    public function __construct( Spotify_Currently_Playing_Auth $auth, Spotify_Currently_Playing_Api $api, Spotify_Currently_Playing_Logging $logging ) {
+        $this->auth = $auth;
         $this->api = $api;
         $this->logging = $logging;
     }
 
     /**
-     * To get the currentlly playing details, Spotify will first need us to get an authorisation token.
-     * Once we have the authorisation token, we can use it to get the access token.
+     * Generate the Spotify authorization URL.
      * 
-     * @TODO - I think the authorisation token is redundant as the user will need to use their own client ID and client secret to get the access token.
-     * I am keeping the method until the integration is finalised.
+     * This method creates a URL that, when accessed, will prompt the user to authorize the application to access their Spotify data.
+     * The URL includes necessary paramaters such as client ID, redirect URI, and required scopes.
      * 
-     * We then make a POST request to the Spotify API to get the access token.
-     * Once we have the access token, we can use it to make a GET request to the Spotify API to get the currently playing details.
+     * @since 1.0.0
+     * 
+     * @return string The complete Spotify authorization URL.
      */
+    public function get_authorization_token() {
+        $this->logging->write_log( 'A request has been made to get the Spotify authorization token.' );
 
-    public function get_authorisation_token() {
-        $this->logging->write_log( 'An attempt to get the Spotify authorisation token was made.' );
-
-        $base_url = 'https://accounts.spotify.com/authorize';
-        $client_id = '';
+        $base_url = $this->auth->get_base_url_authorize();
+        $client_id = $this->auth->get_client_id();
 
         $endpoint = $base_url . '?' . http_build_query( array(
             'client_id' => $client_id,
@@ -35,9 +36,6 @@ class Spotify_Currently_Playing_Requests {
             'show_dialog' => 'true',
         ) );
 
-        /**
-         * Debugging
-         */
-        $this->logging->write_log( 'Endpoint: ' . print_r( $endpoint, true ) );
+        return $endpoint;
     }
 }

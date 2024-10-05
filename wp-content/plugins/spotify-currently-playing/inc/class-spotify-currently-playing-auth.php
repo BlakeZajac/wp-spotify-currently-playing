@@ -5,7 +5,7 @@ class Spotify_Currently_Playing_Auth {
     protected $base_url_api;
     protected $base_url_token;
     protected $client_id;
-    protected $client_secret; // dont think we need this, keep for now
+    protected $client_secret;
     protected $redirect_uri;
 
     public function __construct() {

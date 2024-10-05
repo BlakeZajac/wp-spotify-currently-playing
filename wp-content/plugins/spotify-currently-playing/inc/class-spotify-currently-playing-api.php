@@ -1,6 +1,7 @@
 <?php
 
 class Spotify_Currently_Playing_Api {
+    protected $auth;
     protected $base_url_authorize;
     protected $base_url_api;
     protected $base_url_token;
@@ -39,7 +40,7 @@ class Spotify_Currently_Playing_Api {
             'headers' => array(
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . '',
+                'Authorization' => 'Basic ' . base64_encode( $this->auth->get_client_id() . ':' . $this->auth->get_client_secret() ),
             )
         );
 
