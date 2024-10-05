@@ -74,13 +74,58 @@ class Spotify_Currently_Playing_Requests {
 
         if ( $result ) {
             SCP()->logging->write_log( 'The Spotify access token has been generated.' );
-            $_SESSION['spotify_access_token'] = $result;
+            update_option( 'spotify_access_token', $result['access_token'] );
+
+            if ( isset( $result['refresh_token'] ) ) {
+                update_option( 'spotify_refresh_token', $result['refresh_token'] );
+                SCP()->logging->write_log( 'The Spotify refresh token has been stored.' );
+            }
         } else {
             SCP()->logging->write_log( 'The Spotify access token could not be generated.' );
             return false;
         }
 
         return $result;
+    }
+
+    /**
+     * Refresh the Spotify access token using the stored refresh token.
+     * 
+     * This method sends a POST request to Spotify's token endpoint to obtain a new access token
+     * using the stored refresh token. If successful, it updates the access token and potentially
+     * the refresh token in the WordPress options.
+     */
+    public function get_refresh_token() {
+        SCP()->logging->write_log( 'A request has been made to refresh the Spotify access token.' );
+
+        $refresh_token = get_option( 'spotify_refresh_token' );
+
+        if ( ! $refresh_token ) {
+            SCP()->logging->write_log( 'No refresh token was found. Cannot refresh access token.' );
+            return false;
+        }
+
+        $endpoint = '?' . http_build_query( array(
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refresh_token,
+            'client_id' => $this->auth->get_client_id(), // don't think we need this, keeping for now
+        ) );
+
+        $result = $this->api->post_request( 'token', $endpoint );
+
+        if ( $result && isset( $result['access_token'] ) ) {
+            SCP()->logging->write_log( 'The Spotify access token has been refreshed.' );
+            update_option( 'spotify_access_token', $result['access_token'] );
+
+            if ( isset( $result['refresh_token'] ) ) {
+                update_option( 'spotify_refresh_token', $result['refresh_token'] );
+            }
+
+            return $result['access_token'];
+        } else {
+            SCP()->logging->write_log( 'The Spotify access token could not be refreshed.' );
+            return false;
+        }
     }
 
     /**
@@ -101,7 +146,7 @@ class Spotify_Currently_Playing_Requests {
 
         $result = $this->api->get_request( $endpoint );
 
-        if ( $result && isset( $result->item ) ) {
+        if ( is_object( $result ) && isset( $result->item ) ) {
             SCP()->logging->write_log( 'The currently playing track has been retrieved.' );
 
             return array(
