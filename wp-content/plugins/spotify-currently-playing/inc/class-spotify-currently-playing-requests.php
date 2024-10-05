@@ -1,6 +1,6 @@
 <?php
 
-class Spotify_Currently_Playing_Login {
+class Spotify_Currently_Playing_Requests {
     protected $api;
     protected $logging;
 
@@ -10,8 +10,16 @@ class Spotify_Currently_Playing_Login {
     }
 
     /**
+     * To get the currentlly playing details, Spotify will first need us to get an authorisation token.
+     * Once we have the authorisation token, we can use it to get the access token.
      * 
+     * @TODO - I think the authorisation token is redundant as the user will need to use their own client ID and client secret to get the access token.
+     * I am keeping the method until the integration is finalised.
+     * 
+     * We then make a POST request to the Spotify API to get the access token.
+     * Once we have the access token, we can use it to make a GET request to the Spotify API to get the currently playing details.
      */
+
     public function get_authorisation_token() {
         $this->logging->write_log( 'An attempt to get the Spotify authorisation token was made.' );
 
